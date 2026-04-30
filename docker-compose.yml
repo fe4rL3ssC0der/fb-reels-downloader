@@ -1,0 +1,10 @@
+services:
+  fb-reels-downloader:
+    build: .
+    container_name: fb-reels-downloader
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./downloads:/downloads
+      - .:/app
+    restart: unless-stopped
