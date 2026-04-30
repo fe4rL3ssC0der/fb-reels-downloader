@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FB Reels Downloader</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { background: #0a0a0a; }
+        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); }
+        .card { transition: all 0.3s; }
+        .reel-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+            gap: 1.25rem; 
+        }
+        @media (max-width: 640px) {
+            .reel-grid { grid-template-columns: 1fr; }
+        }
+        .accent-green { color: #22c55e; }
+    </style>
+</head>
+<body class="text-gray-100 min-h-screen">
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- Sidebar (Desktop + Mobile Menu) -->
+        <div id="sidebar" class="w-64 bg-zinc-950 border-r border-zinc-800 flex flex-col fixed md:static h-full z-50 transform -translate-x-full md:translate-x-0 transition-transform">
+            <div class="p-6 border-b border-zinc-800 flex items-center justify-between">
+                <h1 class="text-2xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-film text-emerald-500"></i>
+                    Reels DL
+                </h1>
+                <button onclick="toggleSidebar()" class="md:hidden text-2xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <nav class="flex-1 p-4 space-y-1">
+                <button onclick="showTab('download-tab');toggleSidebar()" 
+                        class="w-full text-left px-4 py-3 rounded-2xl hover:bg-zinc-900 flex items-center gap-3 text-emerald-400">
+                    <i class="fa-solid fa-download"></i> Download
+                </button>
+                <button onclick="showTab('monitor-tab');toggleSidebar()" 
+                        class="w-full text-left px-4 py-3 rounded-2xl hover:bg-zinc-900 flex items-center gap-3">
+                    <i class="fa-solid fa-clock"></i> Auto Monitor
+                </button>
+                <button onclick="showTab('settings-tab');toggleSidebar()" 
+                        class="w-full text-left px-4 py-3 rounded-2xl hover:bg-zinc-900 flex items-center gap-3">
+                    <i class="fa-solid fa-gear"></i> Settings
+                </button>
+            </nav>
+            <div class="p-4 border-t border-zinc-800 text-xs text-zinc-500 text-center">
+                For Mindless Rutabaga
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Bar -->
+            <div class="bg-zinc-900 border-b border-zinc-800 px-4 md:px-8 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="md:hidden text-2xl">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h2 id="page-title" class="text-2xl md:text-3xl font-semibold">Download Reels</h2>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div class="relative hidden sm:block">
+                        <input id="search" type="text" placeholder="Search reels..." 
+                               onkeyup="filterReels()" 
+                               class="bg-zinc-800 border border-zinc-700 rounded-full py-2 px-5 pl-10 w-72 focus:outline-none focus:border-emerald-500">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-3 text-zinc-500"></i>
+                    </div>
+                    <button onclick="toggleDarkMode()" class="w-9 h-9 bg-zinc-800 hover:bg-zinc-700 rounded-2xl flex items-center justify-center">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Contents -->
+            <div class="flex-1 overflow-auto p-4 md:p-8">
+
+                <!-- DOWNLOAD TAB -->
+                <div id="download-tab" class="tab">
+                    <div class="glass rounded-3xl p-5 md:p-6 mb-8">
+                        <div class="flex flex-col md:flex-row gap-3">
+                            <input id="page_url" type="text" placeholder="https://www.facebook.com/yourpage" 
+                                   class="flex-1 bg-zinc-900 border border-zinc-700 rounded-2xl px-6 py-4 focus:outline-none focus:border-emerald-500">
+                            <button hx-post="/fetch" hx-target="#reel-list" hx-include="#page_url"
+                                    class="bg-emerald-500 hover:bg-emerald-600 px-8 py-4 rounded-2xl font-semibold flex items-center gap-2 whitespace-nowrap">
+                                <i class="fa-solid fa-arrow-down"></i> Load Reels
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="reel-list" class="reel-grid"></div>
+
+                    <div class="mt-10 glass rounded-3xl p-6">
+                        <h3 class="text-xl font-semibold mb-4">Download Selected</h3>
+                        <form hx-post="/download" hx-target="#progress-area" class="flex flex-col sm:flex-row gap-4 items-end">
+                            <select name="quality" class="bg-zinc-900 border border-zinc-700 rounded-2xl px-6 py-4 flex-1">
+                                <option value="best">Best Quality</option>
+                                <option value="hd">HD 720p</option>
+                                <option value="sd">SD</option>
+                            </select>
+                            <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 px-10 py-4 rounded-2xl font-bold w-full sm:w-auto">
+                                Download Selected
+                            </button>
+                        </form>
+                        <div id="progress-area" class="mt-6"></div>
+                    </div>
+                </div>
+
+                <!-- MONITOR TAB -->
+                <div id="monitor-tab" class="tab hidden">
+                    <div class="max-w-lg glass rounded-3xl p-8 mx-auto text-center">
+                        <i class="fa-solid fa-clock text-6xl text-emerald-500 mb-6"></i>
+                        <h3 class="text-3xl font-semibold mb-4">Auto Monitoring</h3>
+                        <button hx-post="/start_monitor" hx-include="#page_url" 
+                                class="w-full bg-emerald-500 hover:bg-emerald-600 py-6 rounded-3xl text-xl font-bold">
+                            Start Monitoring This Page
+                        </button>
+                        <p class="text-zinc-400 mt-6">New reels will be auto-downloaded using your saved settings.</p>
+                    </div>
+                </div>
+
+                <!-- SETTINGS TAB -->
+                <div id="settings-tab" class="tab hidden">
+                    <div class="max-w-2xl mx-auto glass rounded-3xl p-6 md:p-8">
+                        <h2 class="text-3xl font-bold mb-8">Settings</h2>
+                        <form hx-post="/settings" hx-target="#save-status" class="space-y-8">
+                            <div>
+                                <label class="block text-sm mb-2">Default Download Folder</label>
+                                <input name="download_dir" value="{{ settings.download_dir }}" 
+                                       class="w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-6 py-4">
+                            </div>
+                            <!-- Add other settings fields the same way -->
+                            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg">
+                                Save All Settings
+                            </button>
+                        </form>
+                        <div class="flex flex-col sm:flex-row gap-4 mt-8">
+                            <button hx-get="/export-settings" class="flex-1 py-4 border border-emerald-500 rounded-3xl">Export Settings</button>
+                            <label class="flex-1 py-4 border border-emerald-500 rounded-3xl text-center cursor-pointer">
+                                Import Settings <input type="file" id="import-file" class="hidden" onchange="importSettings(this)">
+                            </label>
+                        </div>
+                        <div id="save-status" class="mt-4 text-center"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            const titles = {
+                'download-tab': 'Download Reels',
+                'monitor-tab': 'Auto Monitor',
+                'settings-tab': 'Settings'
+            };
+            document.getElementById('page-title').textContent = titles[tabId];
+        }
+
+        function filterReels() {
+            const term = document.getElementById('search').value.toLowerCase();
+            document.querySelectorAll('.reel-card').forEach(card => {
+                card.style.display = card.dataset.title.toLowerCase().includes(term) ? 'block' : 'none';
+            });
+        }
+
+        function importSettings(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                fetch('/settings', { method: 'POST', body: new URLSearchParams(JSON.parse(e.target.result)) })
+                    .then(() => location.reload());
+            };
+            reader.readAsText(file);
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth < 768 && !sidebar.contains(e.target) && !e.target.closest('button[onclick*="toggleSidebar"]')) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        });
+
+        // Keyboard shortcut for search
+        document.addEventListener('keydown', e => {
+            if (e.key === '/' && document.getElementById('search')) {
+                e.preventDefault();
+                document.getElementById('search').focus();
+            }
+        });
+    </script>
+</body>
+</html>
