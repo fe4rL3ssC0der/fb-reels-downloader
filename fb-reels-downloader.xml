@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>fb-reels-downloader</Name>
-  <Repository>ghcr.io/YOUR-GITHUB-USERNAME/fb-reels-downloader:latest</Repository> <!-- Change to your username -->
-  <Registry>https://github.com/YOUR-GITHUB-USERNAME/fb-reels-downloader</Registry>
+  <Repository>ghcr.io/fe4rL3ssC0der/fb-reels-downloader:latest</Repository> <!-- Change to your username -->
+  <Registry>https://github.com/fe4rL3ssC0der/fb-reels-downloader</Registry>
   <Network>bridge</Network>
   <Shell>bash</Shell>
   <Privileged>false</Privileged>
-  <Support>https://github.com/YOUR-GITHUB-USERNAME/fb-reels-downloader/issues</Support>
-  <Project>https://github.com/YOUR-GITHUB-USERNAME/fb-reels-downloader</Project>
+  <Support>https://github.com/fe4rL3ssC0der/fb-reels-downloader/issues</Support>
+  <Project>https://github.com/fe4rL3ssC0der/fb-reels-downloader</Project>
   <Overview>
     Beautiful dark-themed web GUI to download Facebook Reels from any public page. 
     Features: Multi-select, quality options, auto-monitoring, progress bars, mobile responsive, persistent settings.
@@ -16,11 +16,11 @@
     Modern dashboard for downloading Facebook Reels. Built with FastAPI + HTMX + Tailwind. 
     yt-dlp powered. Perfect for Unraid.
   </Description>
-  <Icon>https://raw.githubusercontent.com/YOUR-GITHUB-USERNAME/fb-reels-downloader/main/icon.png</Icon> <!-- Optional: Add an icon later -->
-  <Banner>https://raw.githubusercontent.com/YOUR-GITHUB-USERNAME/fb-reels-downloader/main/banner.png</Banner> <!-- Optional -->
+  <Icon>https://raw.githubusercontent.com/fe4rL3ssC0der/fb-reels-downloader/main/icon.png</Icon> <!-- Optional: Add an icon later -->
+  <Banner>https://raw.githubusercontent.com/fe4rL3ssC0der/fb-reels-downloader/main/banner.png</Banner> <!-- Optional -->
   
   <WebUI>http://[IP]:[PORT:8000]</WebUI>
-  <TemplateURL>https://raw.githubusercontent.com/YOUR-GITHUB-USERNAME/fb-reels-downloader/main/fb-reels-downloader.xml</TemplateURL>
+  <TemplateURL>https://raw.githubusercontent.com/fe4rL3ssC0der/fb-reels-downloader/main/fb-reels-downloader.xml</TemplateURL>
   
   <Category>Downloaders:Media</Category>
   <DateInstalled/>
