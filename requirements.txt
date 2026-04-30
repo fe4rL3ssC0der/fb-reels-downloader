@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+jinja2
+httpx
+yt-dlp
+python-multipart
+apscheduler
